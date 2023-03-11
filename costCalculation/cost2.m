@@ -39,9 +39,8 @@ feature=[mean(diff_lambda),var(diff_lambda),skewness(diff_lambda),kurtosis(diff_
 
 Cost = zeros(size(vf,2),3,length(I));
 
-% parfor_progress(size(vf,2));
-for i=1:size(vf,2)
-    i
+parfor_progress(size(vf,2));
+parfor i=1:size(vf,2)
     B = zeros(3,length(I));
     modified_face=face(vf{i},:);
     for j=1:3 %x y z 
@@ -76,12 +75,12 @@ for i=1:size(vf,2)
         end
     end
     Cost(i,:,:)=B;
-%     parfor_progress;
+    parfor_progress;
 end
 
 % save costs
 save(fullfile(save_pth,[mesh_index,'.mat']),'Cost');
-% parfor_progress(0);
+parfor_progress(0);
 end
 % calculation of eigen-values
 function lambda = lambdaCalculation(m_face,np2,f_n,f_a)

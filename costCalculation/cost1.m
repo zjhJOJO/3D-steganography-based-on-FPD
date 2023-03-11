@@ -37,9 +37,8 @@ feature=[mean(diff_lambda),var(diff_lambda),skewness(diff_lambda),kurtosis(diff_
 Cost = zeros(size(vf,2),3,length(I));
 
 %calculate the vertex-changing costs
-% parfor_progress(size(vf,2));
-for i=1:size(vf,2)
-    i
+parfor_progress(size(vf,2));
+parfor i=1:size(vf,2)
     modified_face=face(vf{i},:);
     B = zeros(3,length(I));
     for j=1:3 %x y z
@@ -74,16 +73,19 @@ for i=1:size(vf,2)
         end
     end
     Cost(i,:,:)=B;
-%     parfor_progress;
+    parfor_progress;
 end
 
 % save costs
 save(fullfile(save_pth,[mesh_index,'.mat']),'Cost');
-% parfor_progress(0);
+parfor_progress(0);
 
 end
 % 
 function lambda = lambdaCalculation(m_vertex,vertex,vf,f_n,f_a,f_ce)
+    f_n(isnan(f_n))=eps;
+    f_a(isnan(f_a))=eps;
+    f_ce(isnan(f_ce))=eps;
     n_face = vf{m_vertex};
     area = f_a(n_face);
     n_face_normal = f_n(n_face,:);
@@ -91,7 +93,7 @@ function lambda = lambdaCalculation(m_vertex,vertex,vf,f_n,f_a,f_ce)
     max_area = max(area);  
     cov_mat = zeros(3,3);
     for i = 1:size(n_face,2)
-        mu = (area(i)/max_area)*exp(3*sqrt(sum(vertex(m_vertex,:)-face_C(i,:)).^2));
+        mu = (area(i)/(max_area+eps))*exp(3*sqrt(sum(vertex(m_vertex,:)-face_C(i,:)).^2));
         cov_mat=cov_mat+mu*n_face_normal(i,:)'*n_face_normal(i,:);
     end
     [~, eig_val] = eig(cov_mat);
