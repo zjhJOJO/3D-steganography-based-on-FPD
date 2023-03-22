@@ -85,7 +85,7 @@ end
 function lambda = lambdaCalculation(m_vertex,vertex,vf,f_n,f_a,f_ce)
     f_n(isnan(f_n))=eps;
     f_a(isnan(f_a))=eps;
-    f_a(isnan(f_ce))=eps;
+    f_ce(isnan(f_ce))=eps;
     n_face = vf{m_vertex};
     area = f_a(n_face);
     n_face_normal = f_n(n_face,:);
