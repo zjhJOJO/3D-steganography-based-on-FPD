@@ -3,10 +3,10 @@ addpath(genpath('data'));
 addpath(genpath('3Dtools'));
 addpath(genpath('functions'));
 
-cover_dir = 'data/TSM/';
-stego_dir='data/stego_TSM/6/';
+cover_dir = '../../data/cover/PMN_trimmed';
+stego_dir='../../data/stego/FPD/PMN_trimmed/6';
  
-cost_dir='./cost/TSM/normalize/';
+cost_dir='../Cost/costm';
 
 mesh=dir(cost_dir);
 mesh_num = length(mesh)-2;
@@ -14,7 +14,6 @@ mesh_num = length(mesh)-2;
 % 0 for Q-layered STC;1 for optimal embedding simulation
 embedding_method=0;
 
-payload=3; % allowed payloads 1.5 3 4.5 6
 iter_num=1000;
 precision=0.0001;
 
@@ -23,11 +22,12 @@ sdn=10^(-6);
 % allowed vertex change range¡£
 % not that |I|=16->payload 6, |I|=8->4.5, |I|=4->3, |I|=2->1.5
 % becuase 1-layered STC's max payload is 0.5
-I = (1:4)-2;
+payload=6; % allowed payloads 1.5 3 4.5 6
+I = (1:16)-8;
 
 %/********* STC setting ************/
 load('dv_best_submatrices.mat');
-H_hat = double(submatrices{2,7});
+H_hat = double(submatrices{2,10});
 % Not all combinations are known.
 H=create_pcm_from_submatrix(H_hat, 3);
 
@@ -40,12 +40,12 @@ code = create_code_from_submatrix(H_hat, 3);
 RandStream.setGlobalStream(RandStream('mt19937ar','Seed',sum(100*clock)));
 
 for i=1:mesh_num
+    i
     name=mesh(i+2).name;
     b=strsplit(name,'.');
-    cover_mesh = [cover_dir,b{1},'.ply'];
-    [vertex,face]=read_ply(cover_mesh);
-    vertex=vertex';face=face'; % vertex [3xNv], face[3xNf]
-    cost=load([cost_dir,name]);
+    cover_mesh = fullfile(cover_dir,[b{1},'.off']);
+    [vertex,face]=read_off(cover_mesh);
+    cost=load(fullfile(cost_dir,name));
     cost=cost.w;
     
     ver_stego = zeros(3,size(vertex,2));
@@ -60,7 +60,7 @@ for i=1:mesh_num
    end
    % write off file
    
-    output_path=[stego_dir,b{1},'.off'];
+    output_path=fullfile(stego_dir,[b{1},'.off']);
     write_off(output_path, ver_stego, face);
 
 end    
